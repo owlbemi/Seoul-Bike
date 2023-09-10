@@ -1,0 +1,10 @@
+---
+title: "seoul_bike"
+output: pdf_document
+---
+
+```{r}
+# read pdf
+
+
+```
