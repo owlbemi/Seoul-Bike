@@ -7,11 +7,15 @@ output: html_document
 # call necessary packages
 library(ggplot2)
 library(dplyr)
+library(reshape2)
+library(tidyr)
 
 # read the .csv file
 df_raw <- read.csv("/Users/owlbemi/seoul_bike/서울특별시 공공자전거 외국인 대여정보(월별)_23.1-6.csv", fileEncoding = "CP949", encoding = "UTF-8")
 
 df_location <- read.csv("/Users/owlbemi/seoul_bike/공공자전거 대여소 정보(23.06월 기준).csv", fileEncoding = "CP949", encoding = "UTF-8")
+
+df_pop <- read.csv("/Users/owlbemi/seoul_bike/주민등록인구_20230915055038.csv", fileEncoding = "CP949", encoding = "UTF-8")
 
 # data cleaning
 df_raw <- na.omit(df_raw)
@@ -30,6 +34,7 @@ colnames(df_location) <- c("대여소.번호", "대여소.명", "소재지", "�
 
 df_location <- na.omit(df_location)
 summary(df_location)
+
 ```
 ```{r}
 # exploratory analysis (EDA)
@@ -60,9 +65,13 @@ min_return_loc <- df_raw$`대여소`[min_return]
 df_minmax <- df_raw[c(max_rent, min_rent, max_return, min_return),]
 head(df_minmax)
 
+# convert to long from data
+df_minmax <- gather(df_minmax, key = var, value = value, 대여건수, 반납건수)
+df_minmax <- unique(df_minmax)
+
 # 2023년 6월 여의나루가 가장 많은 대여건수 및 반납건수를 가짐 (영등포구)
 # 2023년 1월 공항시장역 2번출구가 가장 적은 대여건수를 가짐 (강서구)
 # 2023년 1월 해공도서관이 가장 적은 반납건수를 가짐 (강동구)
 
-
+head(df_minmax)
 ```
