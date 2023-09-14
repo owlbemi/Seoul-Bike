@@ -1,25 +1,41 @@
 ---
-title: "R Notebook"
+title: "Seoul Bike Project"
 output: html_document
 ---
 
-The [R plugin](https://www.jetbrains.com/help/pycharm/r-plugin-support.html) for IntelliJ-based IDEs provides
-handy capabilities to work with the [R Markdown](https://www.jetbrains.com/help/pycharm/r-markdown.html) files.
-To [add](https://www.jetbrains.com/help/pycharm/r-markdown.html#add-code-chunk) a new R chunk,
 ```{r}
+# call necessary packages
+library(ggplot2)
+library(dplyr)
+
+# read the .csv file
+df_raw <- read.csv("/Users/owlbemi/seoul_bike/서울특별시 공공자전거 외국인 대여정보(월별)_23.1-6.csv", fileEncoding = "CP949", encoding = "UTF-8")
+
+# data cleaning
+
+df_raw <- na.omit(df_raw)
+summary(df_raw)
+
+# exploratory analysis (EDA)
+# 대여건수 vs 반납건수
+
+# max / min rental and return index
+max_rent <- which.max(df_raw$`대여건수`)
+min_rent <- which.min(df_raw$`대여건수`)
+
+max_return <- which.max(df_raw$`반납건수`)
+min_return <- which.min(df_raw$`반납건수`)
+
+# location of those index
+max_rent_loc <- df_raw$`대여소`[max_rent]
+min_rent_loc <- df_raw$`대여소`[min_rent]
+
+max_return_loc <- df_raw$`대여소`[max_return]
+min_return_loc <- df_raw$`대여소`[min_return]
+
+df_minmax <- df_raw[c(max_rent, min_rent, max_return, min_return),]
+head(df_minmax)
+
+
 
 ```
-position the caret at any line or the code chunk, then click "+".
-
-The code chunk appears:
-```{r}
-```
-
-Type any R code in the chunk, for example:
-```{r}
-mycars <- within(mtcars, { cyl <- ordered(cyl) })
-mycars
-```
-
-Now, click the **Run** button on the chunk toolbar to [execute](https://www.jetbrains.com/help/pycharm/r-markdown.html#run-r-code) the chunk code. The result should be placed under the chunk.
-Click the **Knit and Open Document** to build and preview an output.
