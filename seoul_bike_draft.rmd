@@ -17,9 +17,32 @@ df_location <- read.csv("/Users/owlbemi/seoul_bike/공공자전거 대여소 정
 df_raw <- na.omit(df_raw)
 summary(df_raw)
 
-# exploratory analysis (EDA)
-# 대여건수 vs 반납건수
+df_split <- strsplit(df_raw$대여소, '\\.')
+df_split <- do.call(rbind.data.frame, df_split)
 
+df_raw$`대여소` <- df_split$`c...해공도서관앞.....합정역.1번출구.앞.....합정역.7번출구.앞...`
+df_raw$`대여소` <- trimws(df_raw$`대여소`)
+
+df_location <- df_location %>% select(-("운영.방식":"X.14"))
+df_location <- df_location %>% select(-("설치.시기":"X.3"))
+
+colnames(df_location) <- c("대여소.번호", "대여소.명", "소재지", "주소", "북위", "동경")
+
+df_location <- na.omit(df_location)
+summary(df_location)
+```
+```{r}
+# exploratory analysis (EDA)
+# 지역별 빈도수
+loc_freq <- ggplot(df_location, aes(x = df_location$소재지)) +
+  geom_bar() +
+  labs(title = "서울시 자치구별 대여소 빈도수 (~2023)", x = "소재 자치구", y = "빈도수") +
+  theme_linedraw()
+loc_freq
+
+# 송파구가 가장 많은 대여소를 가짐
+
+# 대여건수 vs 반납건수
 # max / min rental and return index
 max_rent <- which.max(df_raw$`대여건수`)
 min_rent <- which.min(df_raw$`대여건수`)
@@ -37,6 +60,9 @@ min_return_loc <- df_raw$`대여소`[min_return]
 df_minmax <- df_raw[c(max_rent, min_rent, max_return, min_return),]
 head(df_minmax)
 
+# 2023년 6월 여의나루가 가장 많은 대여건수 및 반납건수를 가짐 (영등포구)
+# 2023년 1월 공항시장역 2번출구가 가장 적은 대여건수를 가짐 (강서구)
+# 2023년 1월 해공도서관이 가장 적은 반납건수를 가짐 (강동구)
 
 
 ```
