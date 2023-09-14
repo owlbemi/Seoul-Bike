@@ -11,8 +11,9 @@ library(dplyr)
 # read the .csv file
 df_raw <- read.csv("/Users/owlbemi/seoul_bike/서울특별시 공공자전거 외국인 대여정보(월별)_23.1-6.csv", fileEncoding = "CP949", encoding = "UTF-8")
 
-# data cleaning
+df_location <- read.csv("/Users/owlbemi/seoul_bike/공공자전거 대여소 정보(23.06월 기준).csv", fileEncoding = "CP949", encoding = "UTF-8")
 
+# data cleaning
 df_raw <- na.omit(df_raw)
 summary(df_raw)
 
