@@ -89,7 +89,7 @@ df_minmax <- unique(df_minmax)
 head(df_minmax)
 
 # 구별 대여소 소재지 위치
-register_google(key = "AIzaSyC1WQ_4CGx7CTGQ8i3oT23KYpCkihwwup8")
+register_google(key = "SECRET_API_KEY")
 seoul <- get_map("Seoul, South Korea", zoom = 11, maptype = "roadmap")
 loc_plot <- ggmap(seoul) +
         geom_point(df_location, mapping = aes(x = 동경, y = 북, color = 소재지))

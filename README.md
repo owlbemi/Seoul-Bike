@@ -15,3 +15,11 @@ https://data.seoul.go.kr/dataList/OA-13252/F/1/datasetView.do
 서울시 주민등록 인구 (2023년 2분기) - 대한민국 행정안전부
 
 https://jumin.mois.go.kr/
+
+## 사용된 패키지
+- ggplot2
+- dplyr2
+- reshape2
+- tidyr
+- raster
+- ggmap
