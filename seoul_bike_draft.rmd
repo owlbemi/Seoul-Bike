@@ -32,7 +32,7 @@ df_raw$`대여소` <- trimws(df_raw$`대여소`)
 df_location <- df_location %>% dplyr::select(-("운영.방식":"X.14"))
 df_location <- df_location %>% dplyr::select(-("설치.시기":"X.3"))
 
-colnames(df_location) <- c("대여소.번호", "대여소.명", "소재지", "주소", "북위", "동경")
+colnames(df_location) <- c("대여소.번호", "대여소", "소재지", "주소", "북위", "동경")
 
 df_location <- na.omit(df_location)
 df_location$`북위` <- as.numeric(df_location$`북위`)
@@ -40,14 +40,44 @@ df_location$`동경` <- as.numeric(df_location$`동경`)
 
 summary(df_location)
 
-df_pop <- df_pop %>% select(-c("동별.1.", "X2023.1.4", "X2023.1.4.4", "X2023.2.4"))
-df_pop <- df_pop %>% select(-("X2023.1.4.1":"X2023.1.4.5"))
+df_pop <- df_pop %>% dplyr::select(-c("동별.1.", "X2023.1.4", "X2023.1.4.4", "X2023.2.4"))
+df_pop <- df_pop %>% dplyr::select(-("X2023.1.4.1":"X2023.1.4.5"))
 df_pop <- df_pop[-1,]
 df_pop <- as.data.frame(df_pop)
 
 colnames(df_pop) <- c("동별", "합계", "한국인(명)", "외국인(명)", "인구밀도")
 
-df_pop <- df_pop %>% select(-("인구밀도"))
+df_pop <- df_pop %>% dplyr::select(-("인구밀도"))
+
+df_full <- left_join(df_location, df_raw, by = "대여소")
+df_full <- na.omit(df_full)
+
+df_loc_mod <- df_location %>%
+  group_by(소재지) %>%
+  count() %>%
+  ungroup() %>%
+  mutate(perc = `n` / sum(`n`)) %>%
+  arrange(perc) %>%
+  mutate(labels = scales::percent(perc))
+
+df_loc_mod$한강 <- rep("임시", 25)
+
+df_loc_mod$한강[which(df_loc_mod$소재지 %in% c("강북구", "도봉구", "노원구", "중랑구", "광진구", "성동구", "동대문구", "성북구", "종로구", "중구", "용산구", "은평구", "서대문구", "마포구"))] <- "이북"
+df_loc_mod$한강[which(df_loc_mod$소재지 %in% c("강서구", "양천구", "영등포구","구로구", "동작구", "금천구", "관악구", "서초구", "강남구", "송파구", "강동구"))] <- "이남"
+
+df_raw$일시 <- as.factor(df_raw$일시)
+
+df_all <- data.frame(rep(1,9))
+
+df_all$총대여건수 <- as.data.frame(rep(1, 9))
+df_all$총반납건수 <- as.data.frame(rep(1, 9))
+
+df_all$총대여건수 <- aggregate(df_raw$대여건수, by = list(Category = df_raw$일시), FUN = sum)
+df_all$총반납건수 <- aggregate(df_raw$반납건수, by = list(Category = df_raw$일시), FUN = sum)
+
+df_all <- df_all %>% dplyr::select(-("rep.1..9."))
+
+head(df_all)
 ```
 ```{r}
 # exploratory analysis (EDA)
@@ -57,6 +87,26 @@ loc_freq <- ggplot(df_location, aes(x = df_location$소재지)) +
   labs(title = "서울시 자치구별 대여소 빈도수 (~2023)", x = "소재 자치구", y = "빈도수") +
   theme_linedraw()
 loc_freq
+
+loc_pie <- ggplot(df_loc_mod, aes(x = "", y = perc, fill = 소재지)) +
+  geom_col() +
+  geom_label(aes(label = labels),
+             position = position_stack(vjust = 0.5),
+             show.legend = FALSE) +
+  coord_polar(theta = "y") +
+  labs(title = "서울시 자치구별 대여소 (~2023)", x = "", y = "")
+
+loc_pie
+
+# 한강 이남 vs 이북
+df_loc_ns <- factor()
+
+loc_pie_ns <- ggplot(df_loc_mod, aes(x = "", y = perc, fill = 한강)) +
+  geom_col() +
+  coord_polar(theta = "y") +
+  labs(title = "서울시 한강 이북 vs 이남 대여소 (~2023)", x = "", y = "")
+
+loc_pie_ns
 
 # 송파구가 가장 많은 대여소를 가짐
 
@@ -88,11 +138,30 @@ df_minmax <- unique(df_minmax)
 
 head(df_minmax)
 
+#월별 외국인 이용자수 (2023년)
+usage_plot <- ggplot(df_all, aes(x = Category, y = 대여건수)) +
+  geom_point() +
+  geom_smooth()
+
+usage_plot
+
+# 대여건수 평균 및 반납건수 평균 찾기
+rent_mean <- mean(df_raw$`대여건수`)
+return_mean <- mean(df_raw$`반납건수`)
+
+df_mean <- c(rent_mean, return_mean)
+colnames(df_mean) <- c("평균 대여건수", "평균 반납건수")
+
 # 구별 대여소 소재지 위치
-register_google(key = "SECRET_API_KEY")
+#register_google(key = "INSERT_KEY_HERE")
 seoul <- get_map("Seoul, South Korea", zoom = 11, maptype = "roadmap")
 loc_plot <- ggmap(seoul) +
-        geom_point(df_location, mapping = aes(x = 동경, y = 북, color = 소재지))
+        geom_point(df_location, mapping = aes(x = 동경, y = 북위, color = 소재지))
 
 loc_plot
+
+full_plot <- ggmap(seoul) +
+  geom_point(df_full, mapping = aes(x = 동경, y = 북위, color = 소재지), size = 대여건수)
+
+full_plot
 ```

@@ -1,7 +1,7 @@
 # Seoul-Bike
 따릉이 데이터 미니 프로젝트 입니다.
 
-![img.png](img.png)
+![unnamed.png](..%2FDownloads%2Funnamed.png)
 
 ## 데이터셋 정보
 서울시 공공자전거 외국인 대여정보 - 열린 데이터 광장
