@@ -42,7 +42,7 @@ Using the cleaned data, I've analysed the usage of Seoul's Ttareungee. The analy
 - Usage status by population
 - Improvement Measures Based on Analysis Results
 
-## Based on the analysis results, I've proposed improvement measures for the Ttareungee service. The proposed improvement measures are as follows:
+Based on the analysis results, I've proposed improvement measures for the Ttareungee service. The proposed improvement measures are as follows:
 
 - Provide rental station usage status by time zone to improve user convenience.
 - Provide rental station usage status by day of the week to help users plan their usage.
